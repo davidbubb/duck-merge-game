@@ -317,10 +317,17 @@ namespace DuckMergeGame
         }
         
         /// <summary>
-        /// Trigger game over
+        /// Trigger game over (suppressed in Zen mode)
         /// </summary>
         private void TriggerGameOver()
         {
+            // Zen mode: game over is suppressed
+            if (GameModeManager.Instance != null && GameModeManager.Instance.IsGameOverSuppressed())
+            {
+                Debug.Log("Zen mode: game over suppressed");
+                return;
+            }
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.TriggerGameOver();

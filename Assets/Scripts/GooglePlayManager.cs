@@ -237,5 +237,51 @@ namespace DuckMergeGame
             // PlayGamesPlatform.Instance.ShowLeaderboardUI();
             Debug.Log("Leaderboard UI not yet implemented");
         }
+
+        /// <summary>
+        /// Submit a score to the Google Play global leaderboard
+        /// </summary>
+        public void SubmitLeaderboardScore(int score)
+        {
+            if (!isAuthenticated)
+            {
+                Debug.Log("Cannot submit leaderboard score: Not authenticated");
+                return;
+            }
+
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            // TODO: Replace leaderboard ID with the value from Google Play Console
+            // PlayGamesPlatform.Instance.ReportScore(score, GPGSIds.leaderboard_high_scores, (bool success) => {
+            //     Debug.Log($"Leaderboard score reported: {success}");
+            // });
+            Debug.Log($"Submitting leaderboard score: {score}");
+            #else
+            Debug.Log($"Leaderboard score (simulated): {score}");
+            PlayerPrefs.SetInt("CloudLeaderboardScore", score);
+            PlayerPrefs.Save();
+            #endif
+        }
+
+        /// <summary>
+        /// Report an unlocked achievement to Google Play
+        /// </summary>
+        public void ReportAchievement(string achievementId)
+        {
+            if (!isAuthenticated)
+            {
+                Debug.Log($"Cannot report achievement '{achievementId}': Not authenticated");
+                return;
+            }
+
+            #if UNITY_ANDROID && !UNITY_EDITOR
+            // TODO: Map achievementId strings to GPGS achievement IDs
+            // PlayGamesPlatform.Instance.ReportProgress(achievementId, 100.0f, (bool success) => {
+            //     Debug.Log($"Achievement reported: {achievementId} success={success}");
+            // });
+            Debug.Log($"Reporting achievement: {achievementId}");
+            #else
+            Debug.Log($"Achievement reported (simulated): {achievementId}");
+            #endif
+        }
     }
 }
