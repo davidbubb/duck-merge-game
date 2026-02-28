@@ -15,6 +15,21 @@ namespace DuckMergeGame
         [SerializeField] private Button quitButton;
         [SerializeField] private TextMeshProUGUI highScoreText;
         [SerializeField] private GameObject mainMenuPanel;
+
+        [Header("Phase 2 Buttons")]
+        [SerializeField] private Button achievementsButton;
+        [SerializeField] private Button leaderboardButton;
+        [SerializeField] private Button dailyChallengeButton;
+        [SerializeField] private Button gameModeButton;
+
+        [Header("Phase 2 Panels")]
+        [SerializeField] private AchievementsUI  achievementsUI;
+        [SerializeField] private LeaderboardUI   leaderboardUI;
+        [SerializeField] private DailyChallengeUI dailyChallengeUI;
+        [SerializeField] private GameModeUI       gameModeUI;
+
+        [Header("Daily Challenge Badge")]
+        [SerializeField] private GameObject dailyChallengeBadge;
         
         private void Start()
         {
@@ -33,6 +48,12 @@ namespace DuckMergeGame
             {
                 quitButton.onClick.AddListener(OnQuitClicked);
             }
+
+            // Phase 2 buttons
+            if (achievementsButton  != null) achievementsButton.onClick.AddListener(OnAchievementsClicked);
+            if (leaderboardButton   != null) leaderboardButton.onClick.AddListener(OnLeaderboardClicked);
+            if (dailyChallengeButton != null) dailyChallengeButton.onClick.AddListener(OnDailyChallengeClicked);
+            if (gameModeButton      != null) gameModeButton.onClick.AddListener(OnGameModeClicked);
             
             // Subscribe to game state changes
             if (GameManager.Instance != null)
@@ -41,6 +62,9 @@ namespace DuckMergeGame
                 GameManager.Instance.OnHighScoreChanged += UpdateHighScore;
                 UpdateHighScore(GameManager.Instance.HighScore);
             }
+
+            // Show new-challenge badge when applicable
+            RefreshDailyChallengeBadge();
             
             // Show main menu
             ShowMainMenu();
@@ -76,6 +100,29 @@ namespace DuckMergeGame
                 GameManager.Instance.QuitGame();
             }
         }
+
+        private void OnAchievementsClicked()
+        {
+            if (achievementsUI != null) achievementsUI.Show();
+        }
+
+        private void OnLeaderboardClicked()
+        {
+            if (leaderboardUI != null) leaderboardUI.Show();
+        }
+
+        private void OnDailyChallengeClicked()
+        {
+            if (dailyChallengeUI != null) dailyChallengeUI.Show();
+        }
+
+        private void OnGameModeClicked()
+        {
+            if (gameModeUI != null)
+                gameModeUI.Show();
+            else
+                OnPlayClicked(); // Fallback: start Classic mode directly
+        }
         
         private void UpdateHighScore(int score)
         {
@@ -90,11 +137,24 @@ namespace DuckMergeGame
             if (newState == GameState.MainMenu)
             {
                 ShowMainMenu();
+                RefreshDailyChallengeBadge();
             }
             else
             {
                 HideMainMenu();
             }
+        }
+
+        /// <summary>
+        /// Show a badge dot on the Daily Challenge button when the challenge is not yet completed
+        /// </summary>
+        private void RefreshDailyChallengeBadge()
+        {
+            if (dailyChallengeBadge == null) return;
+            bool hasIncomplete = DailyChallengeManager.Instance != null &&
+                                 DailyChallengeManager.Instance.CurrentChallenge != null &&
+                                 !DailyChallengeManager.Instance.CurrentChallenge.isCompleted;
+            dailyChallengeBadge.SetActive(hasIncomplete);
         }
         
         private void ShowMainMenu()
@@ -114,3 +174,4 @@ namespace DuckMergeGame
         }
     }
 }
+

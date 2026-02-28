@@ -126,7 +126,7 @@ namespace DuckMergeGame
         }
         
         /// <summary>
-        /// Add score from a merge
+        /// Add score from a merge and notify Phase 2 systems
         /// </summary>
         public void AddScore(int tier)
         {
@@ -135,8 +135,23 @@ namespace DuckMergeGame
             int points = gameConfig.GetMergePoints(tier);
             currentScore += points;
             OnScoreChanged?.Invoke(currentScore);
+
+            int resultTier = tier + 1;
+
+            // Notify Phase 2 managers
+            if (AchievementManager.Instance != null)
+            {
+                AchievementManager.Instance.OnMergePerformed(resultTier);
+                AchievementManager.Instance.OnScoreReached(currentScore);
+            }
+
+            if (DailyChallengeManager.Instance != null)
+            {
+                DailyChallengeManager.Instance.OnMergePerformed(resultTier);
+                DailyChallengeManager.Instance.OnScoreChanged(currentScore);
+            }
             
-            Debug.Log($"Merged tier {tier} -> {tier + 1}: +{points} points. Total: {currentScore}");
+            Debug.Log($"Merged tier {tier} -> {resultTier}: +{points} points. Total: {currentScore}");
         }
         
         /// <summary>
